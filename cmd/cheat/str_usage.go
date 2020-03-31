@@ -61,5 +61,16 @@ Examples:
 
   To remove (delete) the foo/bar cheatsheet:
     cheat --rm foo/bar
+
+  To pull proyecto.online cheatsheet changes
+    cheat --po-download
+
+  To add cheat proyecto.online cheatsheet
+    echo "line one\nline two" | cheat --po-add filename
+    Example:
+    echo "# To ssh via pem file (which normally needs 0600 permissions):\nssh -i <pemfile> <user>@<host>" | cheat --po-add ssh
+  
+  To push proyecto.online cheatsheet changes
+    cheat --po-commit
 `)
 }

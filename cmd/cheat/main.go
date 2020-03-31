@@ -21,6 +21,25 @@ const version = "3.8.0"
 
 func main() {
 
+	if len(os.Args) > 1 {
+
+		if os.Args[1] == "--po-download" {
+			cmdPODownload()
+			os.Exit(0)
+		}
+
+		if os.Args[1] == "--po-add" {
+			cmdPOAdd()
+			os.Exit(0)
+		}
+
+		if os.Args[1] == "--po-commit" {
+			cmdPOUpload()
+			os.Exit(0)
+		}
+
+	}
+
 	// initialize options
 	opts, err := docopt.Parse(usage(), nil, true, version, false)
 	if err != nil {
@@ -64,6 +83,7 @@ func main() {
 			"A config file was not found. Would you like to create one now? [Y/n]",
 			true,
 		)
+
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to create config: %v\n", err)
 			os.Exit(1)
@@ -73,6 +93,11 @@ func main() {
 		if !yes {
 			os.Exit(0)
 		}
+
+		unirseAProyectoOnline, _ := installer.Prompt(
+			"Quieres unirte a los cheats de proyecto.online? [Y/n]",
+			true,
+		)
 
 		// read the config template
 		configs := configs()
@@ -85,6 +110,11 @@ func main() {
 		// create paths for community and personal cheatsheets
 		community := path.Join(confdir, "/cheatsheets/community")
 		personal := path.Join(confdir, "/cheatsheets/personal")
+		var po string
+		if unirseAProyectoOnline {
+			po = path.Join(confdir, "/cheatsheets/po")
+			configs = strings.Replace(configs, "PO_PATH", po, -1)
+		}
 
 		// template the above paths into the default configs
 		configs = strings.Replace(configs, "COMMUNITY_PATH", community, -1)
@@ -104,6 +134,25 @@ func main() {
 		if yes {
 			// clone the community cheatsheets
 			if err := installer.Clone(community); err != nil {
+				fmt.Fprintf(os.Stderr, "failed to create config: %v\n", err)
+				os.Exit(1)
+			}
+
+			// also create a directory for personal cheatsheets
+			if err := os.MkdirAll(personal, os.ModePerm); err != nil {
+				fmt.Fprintf(
+					os.Stderr,
+					"failed to create config: failed to create directory: %s: %v\n",
+					personal,
+					err)
+				os.Exit(1)
+			}
+		}
+
+		// clone the community cheatsheets if so instructed
+		if unirseAProyectoOnline {
+			// clone the community cheatsheets
+			if err := installer.ClonePO(po); err != nil {
 				fmt.Fprintf(os.Stderr, "failed to create config: %v\n", err)
 				os.Exit(1)
 			}
@@ -162,7 +211,6 @@ func main() {
 
 	// determine which command to execute
 	var cmd func(map[string]interface{}, config.Config)
-
 	switch {
 	case opts["--directories"].(bool):
 		cmd = cmdDirectories

@@ -64,6 +64,11 @@ cheatpaths:
     tags: [ personal ]
     readonly: false
 
+  - name: po
+    path: PO_PATH
+    tags: [ po ]
+    readonly: false
+
   # While it requires no configuration here, it's also worth noting that
   # 'cheat' will automatically append directories named '.cheat' within the
   # current working directory to the 'cheatpath'. This can be very useful if

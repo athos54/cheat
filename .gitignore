@@ -1,2 +1,4 @@
 dist
 tags
+cmd/cheat/bin
+cmd/cheat/pkg
