@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/mitchellh/go-homedir"
 )
 
 const cloneURL = "https://github.com/cheat/cheatsheets.git"
@@ -43,8 +45,8 @@ func ClonePO(path string) error {
 func PullPO(path string) error {
 	fmt.Println("path", path)
 	// perform the clone in a shell
-	a := "--git-dir=/home/athos/.config/cheat/cheatsheets/po/.git"
-	b := "--work-tree=/home/athos/.config/cheat/cheatsheets/po"
+	a := "--git-dir=" + getUserHomeDir() + "/.config/cheat/cheatsheets/po/.git"
+	b := "--work-tree=" + getUserHomeDir() + "/.config/cheat/cheatsheets/po"
 	cmd := exec.Command("git", a, b, "pull")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -55,12 +57,19 @@ func PullPO(path string) error {
 
 	return nil
 }
-
+func getUserHomeDir() string {
+	home, err := homedir.Dir()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to get user home directory: %v\n", err)
+		os.Exit(1)
+	}
+	return home
+}
 func PushPO(path string) error {
 	fmt.Println("PushPO", path)
 	// perform the clone in a shell
-	a := "--git-dir=/home/athos/.config/cheat/cheatsheets/po/.git"
-	b := "--work-tree=/home/athos/.config/cheat/cheatsheets/po"
+	a := "--git-dir=" + getUserHomeDir() + "/.config/cheat/cheatsheets/po/.git"
+	b := "--work-tree=" + getUserHomeDir() + "/.config/cheat/cheatsheets/po"
 	cmd := exec.Command("git", a, b, "add", ".")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
